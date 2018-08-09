@@ -1,5 +1,5 @@
 <template>
-  <div ref="wrapper">
+  <div ref="wrapper" class="scroll-wrapper">
     <slot></slot>
   </div>
 </template>
@@ -19,12 +19,18 @@ export default {
     data: {
       type: Array,
       default: null
+    },
+    mouseWheel: {
+      type: Boolean,
+      default: true
+    },
+    listenScroll: {
+      type: Boolean,
+      default: false
     }
   },
   mounted () {
-    setTimeout(() => {
-      this._initScroll()
-    }, 20)
+    this._initScroll()
   },
   methods: {
     _initScroll () {
@@ -33,8 +39,14 @@ export default {
       }
       this.scroll = new BScroll(this.$refs.wrapper, {
         probeType: this.probeType,
-        click: this.click
+        click: this.click,
+        mouseWheel: this.mouseWheel
       })
+      if (this.listenScroll) {
+        this.scroll.on('scroll', (pos) => {
+          this.$emit('posY', pos)
+        })
+      }
     },
     enable () {
       this.scroll && this.scroll.enable()
@@ -44,6 +56,12 @@ export default {
     },
     refresh () {
       this.scroll && this.scroll.refresh()
+    },
+    scrollTo () {
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+    },
+    scrollToElement () {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     }
   },
   watch: {
@@ -57,4 +75,8 @@ export default {
 </script>
 
 <style scoped lang='stylus' rel='stylesheet/stylus'>
+.scroll-wrapper{
+  height 100%
+  overflow hidden
+}
 </style>

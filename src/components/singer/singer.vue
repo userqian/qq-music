@@ -1,12 +1,13 @@
 <template>
   <div class="singer">
-    我是 singer 页面
+    <list-view :list='singerList'></list-view>
   </div>
 </template>
 
 <script>
 import { getSingerList } from 'api/singer.js'
 import Singer from 'common/js/singer.js'
+import listView from 'base/listview/listview'
 const TITLE_NAME = '热门'
 const HOT_LENGTH = 10
 export default {
@@ -22,16 +23,14 @@ export default {
     _getSingerList() {
       getSingerList()
         .then(res => {
-          console.log(res)
-          this.singerList = res.data.list
-          this._nomalSingerList()
+          this.singerList = this._nomalSingerList(res.data.list)
         })
         .catch(err => {
           console.log(err)
         })
     },
-    _nomalSingerList() {
-      let list = this.singerList
+    _nomalSingerList(singerList) {
+      let list = singerList
       let map = {
         hot: {
           title: TITLE_NAME,
@@ -72,9 +71,20 @@ export default {
       })
       return hot.concat(ret)
     }
+  },
+  components: {
+    listView
   }
 }
 </script>
 
 <style scoped lang='stylus' rel='stylesheet/stylus'>
+  .singer{
+    position fixed
+    top 84px
+    left 0
+    bottom 0
+    width 100%
+    z-index -1
+  }
 </style>
