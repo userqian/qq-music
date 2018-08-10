@@ -7,7 +7,7 @@
       <li class="list-group" v-for="(item, index) in list" :key="index"  ref="listGroup">
         <h1 class="title">{{item.title}}</h1>
         <ul>
-          <li class="list-group-item"  v-for="(data, index) in item.item" :key="index">
+          <li class="list-group-item" @click='selectItem(data)'  v-for="(data, index) in item.item" :key="index">
             <img v-lazy="data.avatar" class="avatar">
             <span class="name">{{data.name}}</span>
           </li>
@@ -68,6 +68,9 @@ export default {
     }
   },
   methods: {
+    selectItem(item) {
+      this.$emit('select', item)
+    },
     // 左右列表滚动
     touchStartShortCut(index, e) {
       // 点击右侧时候 记录下当前的index 当前pageY
@@ -96,7 +99,6 @@ export default {
         index = this.listHeight.length - 2
       }
       this.$refs.listView.scrollToElement(this.$refs.listGroup[index], 0)
-      this.scrollY = this.$refs.listview.scroll.y
       this.pageIndex = index
     },
     singerScroll(pos) {
@@ -201,6 +203,7 @@ export default {
   background rgba(100,100,100,.2)
   border-radius 8px
   padding 5px 3px
+  z-index 10
   .shortCut{
     font-size 12px
     height 16px

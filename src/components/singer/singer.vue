@@ -1,10 +1,12 @@
 <template>
   <div class="singer">
-    <list-view :list='singerList'></list-view>
+    <list-view :list='singerList' @select='selectSinger'></list-view>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
 import { getSingerList } from 'api/singer.js'
 import Singer from 'common/js/singer.js'
 import listView from 'base/listview/listview'
@@ -20,6 +22,12 @@ export default {
     this._getSingerList()
   },
   methods: {
+    selectSinger(item) {
+      this.$router.push({
+        path: '/singer/' + item.id
+      })
+      this.setSinger(item)
+    },
     _getSingerList() {
       getSingerList()
         .then(res => {
@@ -70,7 +78,10 @@ export default {
         return a.title.charCodeAt(0) - b.title.charCodeAt(0)
       })
       return hot.concat(ret)
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   },
   components: {
     listView
@@ -85,6 +96,5 @@ export default {
     left 0
     bottom 0
     width 100%
-    z-index -1
   }
 </style>
