@@ -46,5 +46,6 @@ export default {
 <style scoped lang='stylus' rel='stylesheet/stylus'>
 .music-list
     .head
+      display flex
 
 </style>
