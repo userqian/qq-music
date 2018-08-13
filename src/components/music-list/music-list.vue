@@ -21,7 +21,7 @@
               @posY='scroll'
               ref='scrollWrapper'>
         <div class="song-list-wrapper">
-          <song-list :songList='songList'></song-list>
+          <song-list :songList='songList' @selectItem='selectItem'></song-list>
         </div>
         <div class="loading-container">
           <loading></loading>
@@ -36,6 +36,8 @@ import scroll from 'base/scroll/scroll'
 import songList from 'base/song-list/song-list'
 import loading from 'base/loading/loading'
 import {prefixStyle} from 'api/dom.js'
+import {mapActions} from 'vuex'
+
 const HEAD_HEIGHT = 40
 const transform = prefixStyle('transform')
 const backdrop = prefixStyle('backdrop-filter')
@@ -78,7 +80,16 @@ export default {
     },
     scroll(pos) {
       this.posY = pos.y
-    }
+    },
+    selectItem(item, index) {
+      this.selectPlayer({
+        list: this.songList,
+        index
+      })
+    },
+    ...mapActions([
+      'selectPlayer'
+    ])
   },
   watch: {
     posY(newY) {
