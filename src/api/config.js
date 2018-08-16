@@ -4,7 +4,7 @@ export const commonParam = {
   outCharset: 'utf-8',
   platform: 'h5',
   needNewCode: 1,
-  notic: 0,
+  notice: 0,
   format: 'json'
 }
 

@@ -11,7 +11,7 @@ import musicList from 'components/music-list/music-list'
 import {mapGetters} from 'vuex'
 import {getSingerDetail} from 'api/singer.js'
 import {ERR_OK} from 'api/config.js'
-import {musicData} from 'common/js/song.js'
+import {createData, isValidMusic, processSongsUrl} from 'common/js/song.js'
 export default {
   computed: {
     title() {
@@ -40,15 +40,19 @@ export default {
       }
       getSingerDetail(this.singer.id).then((res) => {
         if (res.code === ERR_OK) {
-          this.song = this._nomalSoneList(res.data.list)
+          processSongsUrl(this._nomalSoneList(res.data.list)).then((songs) => {
+            this.song = songs
+            console.log('songs')
+          })
         }
       })
     },
     _nomalSoneList(list) {
       let ret = []
       list.forEach((item) => {
-        if (item.musicData) {
-          ret.push(musicData(item.musicData))
+        let {musicData} = item
+        if (isValidMusic(musicData)) {
+          ret.push(createData(musicData))
         }
       })
       return ret
