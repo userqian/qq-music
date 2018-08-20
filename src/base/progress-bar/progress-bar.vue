@@ -59,6 +59,8 @@ export default {
       this._triggerPercent()
     },
     progressBarCick(e) {
+      // let rect = this.$refs.progressBtn.getBoundingClientRect()
+      // let left = e.pageX - rect
       this._offset(e.offsetX)
       this._triggerPercent()
     },

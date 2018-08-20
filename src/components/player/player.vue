@@ -23,9 +23,20 @@
               <p class="playing-lyric"></p>
             </div>
           </div>
-          <div class="middle-r">
-
-          </div>
+          <scroll ref="lyric" v-if="currentLyric" :data='currentLyric && currentLyric.lines'>
+            <div class="middle-r">
+              <div class="lyric-wrapper">
+                <p class="lyric" 
+                v-for="(item, index) in currentLyric.lines" 
+                :key="index"
+                :class="{'active': lyricActive === index}"
+                ref='lyricLine'>
+                  {{item.txt}}
+                </p>
+              </div>
+            </div>
+          </scroll>
+          
         </div>
         <div class="bottom">
           <div class="dot-wrappper">
@@ -76,7 +87,12 @@
         </div>
       </div>
     </transition>
-    <audio ref="playing" :src="currentSong.url" @canplay='ready' @error='error' @timeupdate='updateTime'></audio>
+    <audio ref="playing" 
+           :src="currentSong.url" 
+           @canplay='ready' 
+           @error='error' 
+           @timeupdate='updateTime'
+           @ended='end'></audio>
   </div>
 </template>
 
@@ -86,13 +102,18 @@ import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'api/dom.js'
 import progressBar from 'base/progress-bar/progress-bar'
 import {playMode} from 'common/js/config.js'
+import {shuffle} from 'common/js/util.js'
+import LyricParse from 'lyric-parser'
+import scroll from 'base/scroll/scroll'
 
 const transform = prefixStyle('transform')
 export default {
   data() {
     return {
       readyPlay: false,
-      currentTime: 0
+      currentTime: 0,
+      currentLyric: null,
+      lyricActive: 0
     }
   },
   methods: {
@@ -193,6 +214,13 @@ export default {
     error() {
       this.readyPlay = true
     },
+    end() {
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        this.nextPlay()
+      }
+    },
     updateTime(e) {
       this.currentTime = e.target.currentTime
     },
@@ -224,22 +252,55 @@ export default {
     changeMode() {
       const mode = (this.mode + 1) % 3
       this.setMode(mode)
-      const list = null
-      if(mode === 0) {
-          
-      }     
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list)
+      this.setPlayList(list)
+    },
+    resetCurrentIndex(list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
+    },
+    getLyric() {
+      this.currentSong.getLyric().then((lyric) => {
+        this.currentLyric = new LyricParse(lyric, this.handleLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+        console.log(this.currentLyric)
+      })
+    },
+    handleLyric({lineNum, text}) {
+      if (lineNum > 5) {
+        let lyricNum = this.$refs.lyricLine[lineNum - 5]
+        this.$refs.lyric.scrollToElement(lyricNum, 1000)
+      } else {
+        this.$refs.lyric.scrollToElement(0, 0, 1000)
+      }
+      this.lyricActive = lineNum
     },
     ...mapMutations({
       'setFullScreen': 'SET_FULL_SCREEN',
       'setPlayingState': 'SET_PLAYING',
       'setCurrentIndex': 'SET_CURRENT_INDEX',
-      'setMode': 'SET_MODE'
+      'setMode': 'SET_MODE',
+      'setPlayList': 'SET_PLAY_LIST'
     })
   },
   watch: {
-    currentSong() {
+    currentSong(newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return
+      }
       this.$nextTick(() => {
         this.$refs.playing.play()
+        this.getLyric()
       })
     },
     playing(val) {
@@ -271,11 +332,13 @@ export default {
       'currentSong',
       'playing',
       'currentIndex',
-      'mode'
+      'mode',
+      'sequenceList'
     ])
   },
   components: {
-    progressBar
+    progressBar,
+    scroll
   }
 }
 </script>
@@ -328,8 +391,14 @@ export default {
             color #ffcd32
             transform rotate(-90deg)
         .title
-          line-height 40px
-          font-size 18px
+          width: 80%;
+          height: 40px;
+          line-height: 40px;
+          margin: 0 auto;
+          font-size: 18px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         .name
           line-height 20px
           font-size 14px
@@ -344,6 +413,7 @@ export default {
           position relative
           height 0
           padding-top 80%
+          display none
           .cd-wrapper
             position absolute
             top 0px
@@ -360,6 +430,18 @@ export default {
                 border-radius 50%
                 border 10px solid rgba(255,255,255,0.1)
                 box-sizing border-box
+        .middle-r
+          position relative
+          .lyric-wrapper
+            width 80%
+            margin 0 auto
+            text-align center
+            .lyric
+              line-height 32px
+              font-size 14px
+              color rgba(255,255,255,0.5)
+              &.active
+                color #fff
       .bottom
         position absolute
         bottom 50px

@@ -42,7 +42,6 @@ export default {
         if (res.code === ERR_OK) {
           processSongsUrl(this._nomalSoneList(res.data.list)).then((songs) => {
             this.song = songs
-            console.log('songs')
           })
         }
       })
