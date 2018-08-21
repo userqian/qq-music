@@ -12,7 +12,7 @@
           <h1 class="title">{{currentSong.name}}</h1>
           <p class="name">{{currentSong.singer}}</p>
         </div>
-        <div class="middle">
+        <div class="middle" @touchstart='middleStart' @touchmove='middleMove' @touchend='middleEnd'>
           <div class="middle-l">
             <div class="cd-wrapper" ref='cdWrapper'>
               <div class="cd">
@@ -23,25 +23,22 @@
               <p class="playing-lyric"></p>
             </div>
           </div>
-          <scroll ref="lyric" v-if="currentLyric" :data='currentLyric && currentLyric.lines'>
-            <div class="middle-r">
-              <div class="lyric-wrapper">
-                <p class="lyric" 
-                v-for="(item, index) in currentLyric.lines" 
-                :key="index"
-                :class="{'active': lyricActive === index}"
-                ref='lyricLine'>
-                  {{item.txt}}
-                </p>
-              </div>
+          <scroll class="middle-r" ref="lyric" v-if="currentLyric" :data='currentLyric && currentLyric.lines'>
+            <div class="lyric-wrapper">
+              <p class="lyric" 
+              v-for="(item, index) in currentLyric.lines" 
+              :key="index"
+              :class="{'active': lyricActive === index}"
+              ref='lyricLine'>
+                {{item.txt}}
+              </p>
             </div>
           </scroll>
-          
-        </div>
+          </div>
         <div class="bottom">
-          <div class="dot-wrappper">
-            <span class="dot"></span>
-            <span class="dot"></span>
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active': currentDot === 'cd'}"></span>
+            <span class="dot" :class="{'active': currentDot === 'lyric'}"></span>
           </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
@@ -113,8 +110,12 @@ export default {
       readyPlay: false,
       currentTime: 0,
       currentLyric: null,
-      lyricActive: 0
+      lyricActive: 0,
+      currentDot: 'cd'
     }
+  },
+  created() {
+    this.touch = {}
   },
   methods: {
     back() {
@@ -285,6 +286,30 @@ export default {
       }
       this.lyricActive = lineNum
     },
+    // 左右屏幕滑动
+    middleStart(e) {
+      this.initShow = true
+      const touch = e.touches[0]
+      this.touch.startX = touch.pageX
+      this.touch.startY = touch.pageY
+    },
+    middleMove(e) {
+      if (!this.initShow) {
+        return
+      }
+      const touch = e.touches[0]
+      let delatX = touch.pageX - this.touch.startX
+      let delatY = touch.pageY - this.touch.startY
+      if (Math.abs(delatY) > Math.abs(delatX)) {
+        return
+      }
+      const left = this.currentDot === 'cd' ? 0 : window.innerWidth
+      let width = Math.min(Math.max(-window.innerWidth, delatX + left), 0)
+      this.$refs.lyric.$el.style[transform] = `translate3d(${width}px, 0, 0)`
+    },
+    middleEnd(e) {
+
+    },
     ...mapMutations({
       'setFullScreen': 'SET_FULL_SCREEN',
       'setPlayingState': 'SET_PLAYING',
@@ -410,10 +435,12 @@ export default {
         white-space: nowrap;
         font-size: 0;
         .middle-l
+          display inline-block
           position relative
+          width 100%
           height 0
           padding-top 80%
-          display none
+          vertical-align top
           .cd-wrapper
             position absolute
             top 0px
@@ -431,6 +458,7 @@ export default {
                 border 10px solid rgba(255,255,255,0.1)
                 box-sizing border-box
         .middle-r
+          display inline-block
           position relative
           .lyric-wrapper
             width 80%
@@ -446,6 +474,19 @@ export default {
         position absolute
         bottom 50px
         width 100%
+        .dot-wrapper
+          width 100%
+          text-align center
+          .dot
+            display inline-block
+            width 8px
+            height 8px
+            border-radius 50%
+            background rgba(255,255,255,.5)
+            margin-right 10px
+            &.active
+              width 20px
+              border-radius 10px
         .progress-wrapper
           display flex
           width 80%
