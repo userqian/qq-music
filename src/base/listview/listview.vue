@@ -71,6 +71,9 @@ export default {
     selectItem(item) {
       this.$emit('select', item)
     },
+    refresh() {
+      this.$refs.listView.refresh()
+    },
     // 左右列表滚动
     touchStartShortCut(index, e) {
       // 点击右侧时候 记录下当前的index 当前pageY

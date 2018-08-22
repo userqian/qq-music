@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <scroll :data='discList' class='content' ref="scroll">
       <div>
         <div class="slider-wrapper" v-if='sliderList.length'>
@@ -39,7 +39,10 @@ import {ERR_OK} from 'api/config'
 import Slider from 'base/slider/slider'
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
+import {playingMinxi} from 'common/js/minxi'
+
 export default {
+  mixins: [playingMinxi],
   data () {
     return {
       sliderList: [],
@@ -51,6 +54,11 @@ export default {
     this._getRecommendList()
   },
   methods: {
+    handlePlayList(list) {
+      let bottom = list.length > 0 ? '60px' : 0
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
     // 获取轮播列表
     _getRecommend () {
       getRecommend().then(res => {

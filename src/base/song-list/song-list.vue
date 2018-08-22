@@ -31,6 +31,8 @@ export default {
     margin-bottom 30px
     color #fff
     font-size 14px
+    &:last-child
+      margin-bottom 0
     .name, .desc
       width 100%
       margin-top 10px
