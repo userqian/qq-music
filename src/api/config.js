@@ -5,7 +5,7 @@ export const commonParam = {
   platform: 'h5',
   needNewCode: 1,
   notice: 0,
-  format: 'json'
+  format: 'jsonp'
 }
 
 export const options = {

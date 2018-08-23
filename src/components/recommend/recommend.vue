@@ -15,7 +15,7 @@
         <div class="disc-wrapper">
           <h1>热门歌单推荐</h1>
           <ul>
-            <li class="disc-item" v-for="item in discList" :key="item.dissid">
+            <li class="disc-item" @click="recommendDisc(item)" v-for="item in discList" :key="item.dissid">
               <div class="pic">
                 <!-- 图片懒加载 -->
                 <img v-lazy="item.imgurl">
@@ -30,6 +30,7 @@
         <loading v-show = '!discList.length'></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -40,6 +41,7 @@ import Slider from 'base/slider/slider'
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import {playingMinxi} from 'common/js/minxi'
+import {mapMutations} from 'vuex'
 
 export default {
   mixins: [playingMinxi],
@@ -58,6 +60,12 @@ export default {
       let bottom = list.length > 0 ? '60px' : 0
       this.$refs.recommend.style.bottom = bottom
       this.$refs.scroll.refresh()
+    },
+    recommendDisc(item) {
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
+      this.set_disc(item)
     },
     // 获取轮播列表
     _getRecommend () {
@@ -83,7 +91,10 @@ export default {
         this.$refs.scroll.refresh()
         this.isload = true
       }
-    }
+    },
+    ...mapMutations({
+      set_disc: 'SET_DISC'
+    })
   },
   components: {
     Slider,
