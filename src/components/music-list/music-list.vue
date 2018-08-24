@@ -21,7 +21,7 @@
               @posY='scroll'
               ref='scrollWrapper'>
         <div class="song-list-wrapper">
-          <song-list :songList='songList' @selectItem='selectItem'></song-list>
+          <song-list :songList='songList' @selectItem='selectItem' :rank='rank'></song-list>
         </div>
         <div class="loading-container">
           <loading></loading>
@@ -56,6 +56,10 @@ export default {
       default() {
         return []
       }
+    },
+    rank: {
+      type: Boolean,
+      defaule: false
     }
   },
   data() {
