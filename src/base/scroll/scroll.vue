@@ -27,6 +27,10 @@ export default {
     listenScroll: {
       type: Boolean,
       default: false
+    },
+    pullUpLoad: {
+      type: Boolean,
+      default: false
     }
   },
   mounted () {
@@ -45,6 +49,13 @@ export default {
       if (this.listenScroll) {
         this.scroll.on('scroll', (pos) => {
           this.$emit('posY', pos)
+        })
+      }
+      if (this.pullUpLoad) {
+        this.scroll.on('scrollEnd', () => {
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('scrollToEnd')
+          }
         })
       }
     },

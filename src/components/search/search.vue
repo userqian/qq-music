@@ -10,6 +10,7 @@
       </ul>
     </div>
     <suggest :query='query' v-show="query"></suggest>
+    <router-view></router-view>
   </div>
 </template>
 
