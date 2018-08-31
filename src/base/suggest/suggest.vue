@@ -1,6 +1,6 @@
 <template>
   <div class="suggest" ref="suggest">
-    <scroll :data='songlist' ref="scroll" :pullUpLoad='pullUpLoad' @scrollToEnd='searchMore'>
+    <scroll :data='songlist' v-show="songlist.length" ref="scroll" :pullUpLoad='pullUpLoad' @scrollToEnd='searchMore'>
       <ul ref='searchList'>
         <li v-for="(item, index) in songlist" :key="index" class="search-list" @click="selectItem(item)">
           <div class="icon">
@@ -13,6 +13,7 @@
         <loading v-if="checkMore" title=''></loading>
       </ul>
     </scroll>
+    <no-result v-show='!songlist.length'></no-result>
   </div>
 </template>
 
@@ -23,7 +24,8 @@ import {processSongsUrl, isValidMusic, createData} from 'common/js/song.js'
 import scroll from 'base/scroll/scroll'
 import loading from 'base/loading/loading'
 import Singer from 'common/js/singer'
-import {mapMutations} from 'vuex'
+import {mapMutations, mapActions} from 'vuex'
+import noResult from 'base/no-result/no-result'
 
 const TYPE_SINGER = 'singer'
 const perpage = 20
@@ -129,15 +131,21 @@ export default {
           path: `/search/${singer.id}`
         })
         this.set_singer(singer)
+      } else {
+        this.insertSong(item)
       }
     },
     ...mapMutations({
       set_singer: 'SET_SINGER'
+    }),
+    ...mapActions({
+      insertSong: 'insertSong'
     })
   },
   components: {
     scroll,
-    loading
+    loading,
+    noResult
   }
 }
 </script>

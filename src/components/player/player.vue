@@ -295,6 +295,9 @@ export default {
     },
     getLyric() {
       this.currentSong.getLyric().then((lyric) => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new LyricParse(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -377,10 +380,10 @@ export default {
       if (this.currentLyric) {
         this.currentLyric.stop()
       }
-      this.$nextTick(() => {
+      setTimeout(() => {
         this.$refs.playing.play()
         this.getLyric()
-      })
+      }, 500)
     },
     playing(val) {
       this.$nextTick(() => {
