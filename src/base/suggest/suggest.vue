@@ -103,7 +103,7 @@ export default {
     },
     _checkMore(data) {
       let song = data.song
-      if (!song.list.length || song.curnum + (song.page - 1) * song.perpage >= song.totalnum) {
+      if (!song.list.length || song.curnum + (song.curpage - 1) * perpage >= song.totalnum) {
         this.checkMore = false
       }
     },
@@ -134,6 +134,7 @@ export default {
       } else {
         this.insertSong(item)
       }
+      this.$emit('select')
     },
     ...mapMutations({
       set_singer: 'SET_SINGER'

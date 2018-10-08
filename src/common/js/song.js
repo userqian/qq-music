@@ -16,7 +16,7 @@ export default class Song {
   getLyric() {
     if (this.lyric) {
       return Promise().resolve(this.lyric)
-    }
+    } 
     return new Promise((resolve, reject) => {
       getLyric(this.mid).then((res) => {
         if (res.code === ERR_OK) {

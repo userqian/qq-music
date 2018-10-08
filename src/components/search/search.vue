@@ -9,16 +9,25 @@
         </li>
       </ul>
     </div>
-    <suggest :query='query' v-show="query"></suggest>
+    <suggest :query='query' v-show="query" v-on:select='saveSelect'></suggest>
+    <div class="search-history">
+      <div class="search-header">
+        <h1 class="title">搜索历史</h1>
+        <i class="icon-clear"></i>
+      </div>
+      <searchHistory></searchHistory>
+    </div>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import searchHistory from 'base/search-history/search-history'
 import SearchBox from 'base/search-box/search-box'
 import Suggest from 'base/suggest/suggest'
 import {getHotKey} from 'api/search.js'
 import {ERR_OK} from 'api/config.js'
+import {mapActions} from 'vuex'
 export default {
   created() {
     this._getHotKey()
@@ -42,11 +51,18 @@ export default {
     },
     onQueryChage(query) {
       this.query = query
-    }
+    },
+    saveSelect() {
+      this.searchHistory(this.query)
+    },
+    ...mapActions({
+      searchHistory: 'searchHistory'
+    })
   },
   components: { 
     SearchBox,
-    Suggest
+    Suggest,
+    searchHistory
   }
 }
 </script>
